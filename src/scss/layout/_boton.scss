@@ -1,0 +1,38 @@
+.boton-amarillo{
+    @include boton($amarillo, inline);
+    &:hover{
+        background-color: darken($color: $amarillo, $amount: 10)
+    }
+}
+
+.boton-amarillo-block{
+    @include boton($amarillo, block);
+    &:hover{
+        background-color: darken($color: $amarillo, $amount: 10)
+    }
+}
+
+.boton-verde{
+    @include boton($verde, inline-block);
+    border: none;
+    &:hover{
+        background-color: darken($color: $verde, $amount: 10);
+    }
+
+}
+.boton-rojo-block{
+    @include boton($rojo, block); 
+    border: none;
+    &:hover{
+        background-color: darken($color: $rojo, $amount: 10);
+    }
+
+}
+.boton-verde-block{
+    @include boton($verde, block);
+    border: none;
+    &:hover{
+        background-color: darken($color: $verde, $amount: 10);
+    }
+
+}
