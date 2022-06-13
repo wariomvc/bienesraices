@@ -1,6 +1,7 @@
-<?php 
-require('../../includes/funciones.php');
-require '../../includes/config/database.php';
+<?php
+require '../../includes/app.php';
+
+use App\Propiedad;
 
 $auth = isAutenticado();
 if (!$auth) {
@@ -15,7 +16,7 @@ $resultado = mysqli_query($db, $consulta, MYSQLI_STORE_RESULT);
 
 
 
-$msg_errores = [];
+$errores = Propiedad::getErorres();
 $titulo = '';
 $precio = '';
 $descripcion = '';
@@ -26,66 +27,35 @@ $vendedorId = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    echo "<pre>";
-    var_dump($_POST);
-    echo "</pre>";
+    $propiedad = new Propiedad($_POST);
+    $errores = $propiedad->validar();
 
-    echo "<pre>";
-    var_dump($_FILES);
 
-    echo "</pre>";
 
-    
-    $titulo = mysqli_real_escape_string($db, $_POST['titulo']);
+    /* $titulo = mysqli_real_escape_string($db, $_POST['titulo']);
     $precio = mysqli_real_escape_string($db, $_POST['precio']);
     $descripcion = mysqli_real_escape_string($db, $_POST['descripcion']);
     $habitaciones = mysqli_real_escape_string($db, $_POST['habitaciones']);
     $wc = mysqli_real_escape_string($db, $_POST['wc']);
     $estacionamiento = mysqli_real_escape_string($db, $_POST['estacionamiento']);
-    $vendedorId = mysqli_real_escape_string($db, $_POST['vendedor_id']);
+    $vendedorId = mysqli_real_escape_string($db, $_POST['vendedorId']);
     $imagen = $_FILES['imagen'];
-    $creado =  date('Y/m/d');
+    $creado =  date('Y/m/d'); */
 
-    if (empty($titulo)) {
-        $msg_errores[] = "Debes Añadir un Titulo";
-    };
-    if (empty($precio)) {
-        $msg_errores[] = "Debes Añadir un precio";
-    }
-    if (strlen($descripcion) < 50) {
-        $msg_errores[] = "La Descripción debe contener más de 50 caracteres";
-    }
-    if ($habitaciones < 1) {
-        $msg_errores[] = "Debe ser por lo menos una Habitación";
-    }
+    
 
-    if ($wc < 1) {
-        $msg_errores[] = "Debe ser por lo menos una WC";
-    }
-    if ($estacionamiento < 1) {
-        $msg_errores[] = "Debe ser por lo menos una Estacionamiento";
-    }
-    $size = 1000 * 100;
-    if(!$imagen['size']>$size){
-        $msg_errores[] = "La imagen es muy grande ($imagen->size)";
-    }
-    if($imagen['error']){
-        $msg_errores[] = "La imagen es obligatoria";
-    }
-    if ($vendedorId === "") {
-        $msg_errores[] = "Debe ser por lo menos una Estacionamiento";
-    }
+    if (empty($errores)) {
+        $propiedad::setDB($db);
+        $propiedad->guardar();
 
-    if (empty($msg_errores)) {
-        
         //echo $query;
         $carpeta_imagenes = '../../imagenes/';
-        if(!is_dir($carpeta_imagenes)){
+        if (!is_dir($carpeta_imagenes)) {
             mkdir($carpeta_imagenes);
         }
         $nombre_imagen = md5(uniqid(rand())) . ".jpg";
 
-        $res = move_uploaded_file($imagen['tmp_name'], $carpeta_imagenes . $nombre_imagen );
+        $res = move_uploaded_file($imagen['tmp_name'], $carpeta_imagenes . $nombre_imagen);
         /* var_dump($res);
         var_dump($imagen);
         var_dump(($nombre_imagen));
@@ -94,13 +64,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         VALUES ('$titulo', '$precio','$nombre_imagen', '$descripcion', '$habitaciones', '$wc', '$estacionamiento','$creado', '$vendedorId')";
         try {
             //code...
-            $r = mysqli_query($db,$query);
+            $r = mysqli_query($db, $query);
         } catch (\Throwable $th) {
             //throw $th;
             print_r($th);
         }
-        
-        if($r){
+
+        if ($r) {
             header('Location: /admin?res=1');
         }
     }
@@ -112,7 +82,7 @@ incluir_template('header');
     <h1>Crear</h1>
     <a href="/admin/index.php" class="boton-verde" id="">Volver</a>
 
-    <?php foreach ($msg_errores as $error) : ?>
+    <?php foreach ($errores as $error) : ?>
         <div class="alerta error">
             <?php echo $error ?>
         </div>
@@ -147,10 +117,10 @@ incluir_template('header');
         </fieldset>
         <fieldset>
             <legend>Vendedor</legend>
-            <select name="vendedor_id" id="vendedor_id">
+            <select name="vendedorId" id="vendedorId">
                 <option value="">-- Seleeccione Un Vendedor --</option>
                 <?php while ($vendedor   = mysqli_fetch_assoc($resultado)) : ?>
-                    <option <?php echo $vendedor['id'] === $vendedorId ? "selected" : ''; ?>   value="<?php echo $vendedor['id']  ?>"><?php echo $vendedor['nombre'] .' '. $vendedor['apellido'] ?></option>
+                    <option <?php echo $vendedor['id'] === $vendedorId ? "selected" : ''; ?> value="<?php echo $vendedor['id']  ?>"><?php echo $vendedor['nombre'] . ' ' . $vendedor['apellido'] ?></option>
                 <?php endwhile ?>
             </select>
         </fieldset>

@@ -1,9 +1,8 @@
 <?php 
+require 'includes/app.php';
 $inicio = true;
 
-require('includes/funciones.php');
-
-    incluir_template('header', true)
+incluir_template('header', true)
  ?>
     <main class="contenedor seccion">
         <h1>Más Sobre Nosotros</h1>

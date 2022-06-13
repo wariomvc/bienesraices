@@ -1,0 +1,17 @@
+{
+    "name": "wariomvc/bienesraices",
+    "description": "FrontEnd y Backend para sitio web de bienes raices",
+    "autoload": {
+        "psr-4": {
+            "App\\": "./clases"
+        }
+    },
+    "authors": [
+        {
+            "name": "Mario Valenzuela (wariomvc)",
+            "email": "wario.mvc@gmai.com"
+        }
+    ],
+    "require": {}
+    
+}

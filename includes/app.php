@@ -1,4 +1,11 @@
 <?php
+require 'funciones.php';
+require 'config/database.php';
+require __DIR__.'/../vendor/autoload.php';
 
-define('TEMPLATES_URL',__DIR__.'/templates/');
-define('FUNCIONES_URL2','funciones.php');
+function debuguear($objeto){
+    echo "<pre>";
+    var_dump($objeto);
+    echo "</pre>";
+    exit;
+}

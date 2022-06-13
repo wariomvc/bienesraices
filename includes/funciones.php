@@ -1,5 +1,6 @@
 <?php
-require 'app.php';
+define('TEMPLATES_URL',__DIR__.'/templates/');
+define('FUNCIONES_URL2','funciones.php');
 
 function incluir_template(string $nombre, $inicio = false)
 {
