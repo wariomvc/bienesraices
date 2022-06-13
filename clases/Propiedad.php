@@ -11,6 +11,7 @@ class Propiedad
     public $titulo;
     public $precio;
     public $imagen;
+    public $imagen_dataform;
     public $descripcion;
     public $habitaciones;
     public $wc;
@@ -20,18 +21,20 @@ class Propiedad
 
     protected static $errores = [];
 
-    public function __construct($args = [])
+    public function __construct($args = [], $Files=[], string $nombre_imagen = '')
     {
         $this->id = $args['id'] ?? null;
         $this->titulo = $args['titulo'] ?? '';
         $this->precio = $args['precio'] ?? '';
         $this->descripcion = $args['descripcion'] ?? '';
-        $this->imagen = $args['nombre_imagen'] ?? '';
+        $this->imagen = $nombre_imagen;
+        $this->imagen_dataform = $Files;
         $this->habitaciones = $args['habitaciones'] ?? '';
         $this->wc = $args['wc'] ?? '';
         $this->estacionamiento =  $args['estacionamiento']  ?? '';
         $this->creado = date('Y/m/d');
         $this->vendedorId = $args['vendedorId'] ?? '';
+
     }
 
     public static function setDB(\mysqli $db)
@@ -48,7 +51,20 @@ class Propiedad
         $query .= "VALUES ('".$string_valores."' )";
         
         $resultado = self::$db->query($query);
-        debuguear($resultado);
+        return $resultado;
+        
+    }
+
+    public function cargarPropiedad($id){
+        $query = "SELECT * FROM  propiedades WHERE id='$id'";
+        $resultado = self::$db->query($query);
+        
+        foreach ($resultado->fetch_assoc() as $key => $value) {
+            $this->$key = $value;
+        }
+        
+
+
     }
 
     public function atributos()
@@ -59,6 +75,7 @@ class Propiedad
             $atributos[$columna] = $this->$columna;
             
         }
+        
         return $atributos;
     }
 
@@ -106,12 +123,23 @@ class Propiedad
             self::$errores[] = "Debe ser por lo menos una Estacionamiento";
         }
         $size = 1000 * 100;
-        /* if (!$this->imagen['size'] > $size) {
-            self::$errores[] = "La imagen es muy grande ($imagen->size)";
+        
+         if (!$this->imagen_dataform['size'] > $size) {
+            self::$errores[] = "La imagen es muy grande ($this->imagen_dataform['size'])";
         }
-        if ($this->imagen['error']) {
-            self::$errores[] = "La imagen es obligatoria";
-        } */
+        if ($this->imagen_dataform['error']) {
+            switch ($this->imagen_dataform['error']) {
+                case UPLOAD_ERR_NO_FILE:
+                    self::$errores[]="La imagen es obligatoria.";
+                    break;
+                case UPLOAD_ERR_PARTIAL:
+                    self::$errores[]= "Imagen Subida Parcialmente, Intenta con otra imagen";
+                    break;
+                case UPLOAD_ERR_INI_SIZE:
+                    self::$errores[]="Se Excedió el Tamaño Maximo del Archivo. ";
+                    break;
+            }
+        }
         if ($this->vendedorId === "") {
             self::$errores[] = "Debe ser por lo menos una Estacionamiento";
         }

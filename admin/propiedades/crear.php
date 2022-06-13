@@ -32,33 +32,28 @@ $estacionamiento = '';
 $vendedorId = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    $propiedad = new Propiedad($_POST);
+    $nombre_imagen = md5(uniqid(rand())) . ".jpg";
+    $propiedad = new Propiedad($_POST, $_FILES['imagen'], $nombre_imagen);
     $errores = $propiedad->validar();
 
     $carpeta_imagenes = '../../imagenes/';
     if (!is_dir($carpeta_imagenes)) {
         mkdir($carpeta_imagenes);
     }
-    $nombre_imagen = md5(uniqid(rand())) . ".jpg";
-    $image = Image::make($_FILES['imagen']['tmp_name'])->fit(800, 600);
     
-    $propiedad->setImagen($nombre_imagen);
+    
+    //$propiedad->setImagen($nombre_imagen);
  
 
 
 
     if (empty($errores)) {
         $propiedad::setDB($db);
-        $propiedad->guardar();
+        $r = $propiedad->guardar();
+        $image = Image::make($_FILES['imagen']['tmp_name'])->fit(800, 600);
         $image->save($carpeta_imagenes.$nombre_imagen);
-
-        //echo $query;
-
-
-       
         
-       
+        //echo $query;      
         if ($r) {
             header('Location: /admin?res=1');
         }

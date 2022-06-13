@@ -1,7 +1,8 @@
 <?php
-require('../../includes/funciones.php');
-require '../../includes/config/database.php';
 
+use App\Propiedad;
+
+require '../../includes/app.php';
 
 
 $auth = isAutenticado();
@@ -11,13 +12,17 @@ if (!$auth) {
 }
 
 $db = conectarBD();
+$propiedad = new Propiedad();
+Propiedad::setDB($db);
+
 
 $id_propiedad = $_GET['id'];
 $id_propiedad = filter_var($id_propiedad, FILTER_VALIDATE_INT);
+$propiedad->cargarPropiedad($id_propiedad);
 
-$consulta = "SELECT * FROM  propiedades WHERE id='$id_propiedad'";
+/* $consulta = "SELECT * FROM  propiedades WHERE id='$id_propiedad'";
 $resultado = mysqli_query($db, $consulta);
-$propiedad = mysqli_fetch_assoc($resultado);
+$propiedad = mysqli_fetch_assoc($resultado); */
 
 $consulta2 = "SELECT * FROM vendedores";
 $resultado_vendedores = mysqli_query($db, $consulta2);
