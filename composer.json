@@ -12,6 +12,8 @@
             "email": "wario.mvc@gmai.com"
         }
     ],
-    "require": {}
+    "require": {
+        "intervention/image": "^2.7"
+    }
     
 }
