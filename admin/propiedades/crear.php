@@ -4,6 +4,11 @@ require '../../includes/app.php';
 
 use App\Propiedad;
 
+use Intervention\Image\ImageManagerStatic as Image;
+
+
+
+
 $auth = isAutenticado();
 if (!$auth) {
     header('Location: /');
@@ -31,46 +36,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $propiedad = new Propiedad($_POST);
     $errores = $propiedad->validar();
 
-
-
-    /* $titulo = mysqli_real_escape_string($db, $_POST['titulo']);
-    $precio = mysqli_real_escape_string($db, $_POST['precio']);
-    $descripcion = mysqli_real_escape_string($db, $_POST['descripcion']);
-    $habitaciones = mysqli_real_escape_string($db, $_POST['habitaciones']);
-    $wc = mysqli_real_escape_string($db, $_POST['wc']);
-    $estacionamiento = mysqli_real_escape_string($db, $_POST['estacionamiento']);
-    $vendedorId = mysqli_real_escape_string($db, $_POST['vendedorId']);
-    $imagen = $_FILES['imagen'];
-    $creado =  date('Y/m/d'); */
-
+    $carpeta_imagenes = '../../imagenes/';
+    if (!is_dir($carpeta_imagenes)) {
+        mkdir($carpeta_imagenes);
+    }
+    $nombre_imagen = md5(uniqid(rand())) . ".jpg";
+    $image = Image::make($_FILES['imagen']['tmp_name'])->fit(800, 600);
     
+    $propiedad->setImagen($nombre_imagen);
+ 
+
+
 
     if (empty($errores)) {
         $propiedad::setDB($db);
         $propiedad->guardar();
+        $image->save($carpeta_imagenes.$nombre_imagen);
 
         //echo $query;
-        $carpeta_imagenes = '../../imagenes/';
-        if (!is_dir($carpeta_imagenes)) {
-            mkdir($carpeta_imagenes);
-        }
-        $nombre_imagen = md5(uniqid(rand())) . ".jpg";
 
-        $res = move_uploaded_file($imagen['tmp_name'], $carpeta_imagenes . $nombre_imagen);
-        /* var_dump($res);
-        var_dump($imagen);
-        var_dump(($nombre_imagen));
-        exit; */
-        $query = "INSERT INTO propiedades (titulo, precio,imagen, descripcion, habitaciones, wc, estacionamiento,creado, vendedorId)
-        VALUES ('$titulo', '$precio','$nombre_imagen', '$descripcion', '$habitaciones', '$wc', '$estacionamiento','$creado', '$vendedorId')";
-        try {
-            //code...
-            $r = mysqli_query($db, $query);
-        } catch (\Throwable $th) {
-            //throw $th;
-            print_r($th);
-        }
 
+       
+        
+       
         if ($r) {
             header('Location: /admin?res=1');
         }

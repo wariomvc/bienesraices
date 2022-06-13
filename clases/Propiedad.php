@@ -10,6 +10,7 @@ class Propiedad
     public $id;
     public $titulo;
     public $precio;
+    public $imagen;
     public $descripcion;
     public $habitaciones;
     public $wc;
@@ -59,6 +60,13 @@ class Propiedad
             
         }
         return $atributos;
+    }
+
+    public function setImagen($imagen)
+    {
+        if($imagen){
+            $this->imagen = $imagen;
+        }
     }
     public function sanitizarAtributos()
     {
