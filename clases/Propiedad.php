@@ -2,10 +2,10 @@
 
 namespace App;
 
-class Propiedad 
+class Propiedad
 {
     protected static $tabla = 'propiedades';
-    protected static $columnasDB = ['id', 'titulo', 'precio','imagen', 'descripcion', 'habitaciones', 'wc', 'estacionamiento', 'creado', 'vendedorId'];
+    protected static $columnasDB = ['id', 'titulo', 'precio', 'imagen', 'descripcion', 'habitaciones', 'wc', 'estacionamiento', 'creado', 'vendedorId'];
     protected static $db;
     public $id;
     public $titulo;
@@ -21,20 +21,19 @@ class Propiedad
 
     protected static $errores = [];
 
-    public function __construct($args = [], $Files=[], string $nombre_imagen = '')
+    public function __construct($args = [])
     {
         $this->id = $args['id'] ?? null;
         $this->titulo = $args['titulo'] ?? '';
         $this->precio = $args['precio'] ?? '';
         $this->descripcion = $args['descripcion'] ?? '';
-        $this->imagen = $nombre_imagen;
-        $this->imagen_dataform = $Files;
+        $this->imagen = '';
+
         $this->habitaciones = $args['habitaciones'] ?? '';
         $this->wc = $args['wc'] ?? '';
         $this->estacionamiento =  $args['estacionamiento']  ?? '';
         $this->creado = date('Y/m/d');
         $this->vendedorId = $args['vendedorId'] ?? '';
-
     }
 
     public static function setDB(\mysqli $db)
@@ -45,43 +44,74 @@ class Propiedad
     public function guardar()
     {
         $atributos = $this->sanitizarAtributos();
-        $string_columnas = join(',',array_keys($atributos));
-        $string_valores = join("','",array_values($atributos));
-        $query = "INSERT INTO propiedades ( ".$string_columnas." )";
-        $query .= "VALUES ('".$string_valores."' )";
-        
+        $string_columnas = join(',', array_keys($atributos));
+        $string_valores = join("','", array_values($atributos));
+        $query = "INSERT INTO propiedades ( " . $string_columnas . " )";
+        $query .= "VALUES ('" . $string_valores . "' )";
+
         $resultado = self::$db->query($query);
         return $resultado;
-        
     }
 
-    public function cargarPropiedad($id){
+    public function Actualizar()
+    {
+        $atributos = $this->sanitizarAtributos();
+        $datos_query = "";
+        $arreglo_temporal = [];
+        foreach ($atributos as $key => $value) {
+            $arreglo_temporal[]=  "$key = '".$value."' ";
+        }
+        $datos_query = join(',',$arreglo_temporal);
+        $query = "UPDATE propiedades SET ". $datos_query."WHERE id ='".$this->id."'";
+        $resultado = self::$db->query($query);
+        return $resultado;
+    }
+
+    public function cargarPropiedad($id)
+    {
         $query = "SELECT * FROM  propiedades WHERE id='$id'";
         $resultado = self::$db->query($query);
-        
+
         foreach ($resultado->fetch_assoc() as $key => $value) {
             $this->$key = $value;
         }
-        
-
-
     }
 
     public function atributos()
     {
         $atributos = [];
-        foreach(self::$columnasDB as $columna){
-            if($columna==='id') continue;
+        foreach (self::$columnasDB as $columna) {
+            if ($columna === 'id') continue;
             $atributos[$columna] = $this->$columna;
-            
         }
-        
+
         return $atributos;
     }
 
-    public function setImagen($imagen)
+    public function setImagen($imagen, $imagen_data = [])
     {
-        if($imagen){
+        $size = 1000 * 100;
+        if (!empty($imagen_data)) {
+            # code...
+
+            if (!$imagen_data['size'] > $size) {
+                self::$errores[] = "La imagen es muy grande (" . $imagen_data['size'] . ")";
+            }
+            if ($imagen_data['error']) {
+                switch ($imagen_data['error']) {
+                    case UPLOAD_ERR_NO_FILE:
+                        self::$errores[] = "La imagen es obligatoria.";
+                        break;
+                    case UPLOAD_ERR_PARTIAL:
+                        self::$errores[] = "Imagen Subida Parcialmente, Intenta con otra imagen";
+                        break;
+                    case UPLOAD_ERR_INI_SIZE:
+                        self::$errores[] = "Se Excedió el Tamaño Maximo del Archivo. ";
+                        break;
+                }
+            }
+        }
+        if ($imagen) {
             $this->imagen = $imagen;
         }
     }
@@ -115,31 +145,14 @@ class Propiedad
         if ($this->habitaciones < 1) {
             self::$errores[] = "Debe ser por lo menos una Habitación";
         }
-    
+
         if ($this->wc < 1) {
             self::$errores[] = "Debe ser por lo menos una WC";
         }
         if ($this->estacionamiento < 1) {
             self::$errores[] = "Debe ser por lo menos una Estacionamiento";
         }
-        $size = 1000 * 100;
-        
-         if (!$this->imagen_dataform['size'] > $size) {
-            self::$errores[] = "La imagen es muy grande ($this->imagen_dataform['size'])";
-        }
-        if ($this->imagen_dataform['error']) {
-            switch ($this->imagen_dataform['error']) {
-                case UPLOAD_ERR_NO_FILE:
-                    self::$errores[]="La imagen es obligatoria.";
-                    break;
-                case UPLOAD_ERR_PARTIAL:
-                    self::$errores[]= "Imagen Subida Parcialmente, Intenta con otra imagen";
-                    break;
-                case UPLOAD_ERR_INI_SIZE:
-                    self::$errores[]="Se Excedió el Tamaño Maximo del Archivo. ";
-                    break;
-            }
-        }
+        /**/
         if ($this->vendedorId === "") {
             self::$errores[] = "Debe ser por lo menos una Estacionamiento";
         }

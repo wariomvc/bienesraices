@@ -1,13 +1,8 @@
 <?php
 
 require '../../includes/app.php';
-
 use App\Propiedad;
-
 use Intervention\Image\ImageManagerStatic as Image;
-
-
-
 
 $auth = isAutenticado();
 if (!$auth) {
@@ -32,21 +27,26 @@ $estacionamiento = '';
 $vendedorId = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $titulo = $_POST['titulo'];
+    $precio = $_POST['precio'];
+    $descripcion = $_POST['descripcion'];
+    $habitaciones = $_POST['habitaciones'];
+    $wc = $_POST['wc'];
+    $estacionamiento = $_POST['estacionamiento'];
+    $vendedorId = $_POST['vendedorId'];
+    //$imagen_propiedad = $_POST['imagen'];
     $nombre_imagen = md5(uniqid(rand())) . ".jpg";
-    $propiedad = new Propiedad($_POST, $_FILES['imagen'], $nombre_imagen);
+    $propiedad = new Propiedad($_POST);
     $errores = $propiedad->validar();
+
+    $propiedad->setImagen($nombre_imagen,$_FILES['imagen']);
 
     $carpeta_imagenes = '../../imagenes/';
     if (!is_dir($carpeta_imagenes)) {
         mkdir($carpeta_imagenes);
     }
     
-    
-    //$propiedad->setImagen($nombre_imagen);
- 
-
-
-
+    $errores = $propiedad->getErorres();
     if (empty($errores)) {
         $propiedad::setDB($db);
         $r = $propiedad->guardar();
