@@ -1,6 +1,7 @@
 <?php
 
 use App\Propiedad;
+use App\Vendedor;
 use Intervention\Image\ImageManagerStatic as Image;
 
 require '../../includes/app.php';
@@ -15,6 +16,7 @@ if (!$auth) {
 $db = conectarBD();
 $propiedad = new Propiedad();
 Propiedad::setDB($db);
+$vendedores = Vendedor::getAll();
 
 
 $id_propiedad = $_GET['id'];
