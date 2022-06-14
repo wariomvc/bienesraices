@@ -1,6 +1,7 @@
 <?php
 require '../includes/app.php';
 use App\Propiedad;
+use App\Vendedor;
 
 $auth = isAutenticado();
 
@@ -12,6 +13,8 @@ if (!$auth) {
 
 $db = conectarBD();
 Propiedad::setDB($db);
+$propiedades = Propiedad::getAll();
+$vendedores = Vendedor::getAll();
 
 /* Agregar el Template del Header */
 incluir_template('header');
@@ -41,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$propiedades = Propiedad::getAll();
+
 ?>
 <main class="contenedor seccion">
     <h1>Administración</h1>
@@ -85,6 +88,39 @@ $propiedades = Propiedad::getAll();
         </tbody>
     </table>
 </main>
+<section class="contenedor seccion">
+    <h2>Vendedores</h2>
+    <a href="/admin/vendedores/crear.php" class="boton-verde" id="">Nuevo Vendedor</a>
+    <table class="propiedades">
+        <thead>
+            <tr>
+                <td>ID</td>
+                <td>Nombre</td>
+                <td>Appelido</td>
+                <td>Teléfono</td>
+                <td>Acciones</td>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($vendedores as $vendedor) : ?>
+                <tr>
+                    <td><?php echo $vendedor->id ?></td>
+                    <td><?php echo $vendedor->nombre ?></td>
+                    <td><?php echo $vendedor->apellido ?></td>
+                    <td><?php echo $vendedor->telefono ?></td>
+                    <td>
+                        <a href="/admin/vendedores/actualizar.php?id=<?php echo $vendedor->id ?>" class="boton-verde-block">Editar</a>
+                        <form method="POST"  class="w-100">
+                            <input type="hidden" name="id" value="<?php echo $vendedor->id ?>">
+                            <input type="submit" value="Eliminar" class="boton-rojo-block">
+                        </form>
+
+                    </td>
+                </tr>
+            <?php endforeach ?>
+        </tbody>
+    </table>
+</section>
 <!-- Cerrar conexión de BD -->
 <?php mysqli_close($db) ?>
 <?php incluir_template('footer') ?>
