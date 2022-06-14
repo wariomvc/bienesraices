@@ -66,12 +66,16 @@ class Propiedad
         $resultado = self::$db->query($query);
         return $resultado;
     }
-
+    public static function Borrar($id)
+    {
+        $query = "DELETE  FROM propiedades WHERE id = ${id}";
+        $resultado = self::$db->query($query);
+        return $resultado;
+    }
     public function cargarPropiedad($id)
     {
         $query = "SELECT * FROM  propiedades WHERE id='$id'";
         $resultado = self::$db->query($query);
-
         foreach ($resultado->fetch_assoc() as $key => $value) {
             $this->$key = $value;
         }

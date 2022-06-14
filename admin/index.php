@@ -1,6 +1,6 @@
 <?php
-require('../includes/funciones.php');
-require '../includes/config/database.php';
+require '../includes/app.php';
+use App\Propiedad;
 
 $auth = isAutenticado();
 
@@ -13,7 +13,6 @@ if (!$auth) {
 $db = conectarBD();
 
 /* Agregar el Template del Header */
-var_dump($auth);
 incluir_template('header');
 
 /* Respuesta Condicional */
@@ -26,12 +25,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($id) {
         $query = "SELECT imagen FROM propiedades WHERE id = ${id}";
         $resultado_imagen = mysqli_query($db, $query);
-        $propiedad = mysqli_fetch_assoc($resultado_imagen);
-        $query = "DELETE  FROM propiedades WHERE id = ${id}";
-        $resultado = mysqli_query($db, $query);
-        var_dump($resultado_imagen);
+        $propiedad = new Propiedad();
+        Propiedad::setDB($db);
+        $propiedad->cargarPropiedad($id);        
+        $resultado = Propiedad::Borrar($id);
+
+        
         if ($resultado_imagen) {
-            unlink("../imagenes/" . $propiedad['imagen']);
+            unlink("../imagenes/" . $propiedad->imagen);
         }
         if ($resultado) {
             header("location: /admin?res=3");
@@ -73,7 +74,7 @@ $resultado_consulta = mysqli_query($db, $query);
                     <td><?php echo "$" . $propiedad['precio'] ?></td>
                     <td>
                         <a href="/admin/propiedades/actualizar.php?id=<?php echo $propiedad['id'] ?>" class="boton-verde-block">Editar</a>
-                        <form method="POST" action="index.php" class="w-100">
+                        <form method="POST"  class="w-100">
                             <input type="hidden" name="id" value="<?php echo $propiedad['id'] ?>">
                             <input type="submit" value="Eliminar" class="boton-rojo-block">
                         </form>
