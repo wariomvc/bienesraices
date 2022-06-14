@@ -1,28 +1,196 @@
 <?php
+
 namespace App;
-class ActiveRecord
+
+class Propiedad
 {
-    protected static $DB;
-    protected static $tabla = '';
-    protected static $columnasDB = [];
+    protected static $tabla = 'propiedades';
+    protected static $columnasDB = ['id', 'titulo', 'precio', 'imagen', 'descripcion', 'habitaciones', 'wc', 'estacionamiento', 'creado', 'vendedorId'];
+    protected static $db;
+    public $id;
+    public $titulo;
+    public $precio;
+    public $imagen;
+    public $imagen_dataform;
+    public $descripcion;
+    public $habitaciones;
+    public $wc;
+    public $estacionamiento;
+    public $creado;
+    public $vendedorId;
 
     protected static $errores = [];
 
-    public static function setDB($database)
+    public function __construct($args = [])
     {
-        self::$DB = $database;
+        $this->id = $args['id'] ?? null;
+        $this->titulo = $args['titulo'] ?? '';
+        $this->precio = $args['precio'] ?? '';
+        $this->descripcion = $args['descripcion'] ?? '';
+        $this->imagen = '';
+
+        $this->habitaciones = $args['habitaciones'] ?? '';
+        $this->wc = $args['wc'] ?? '';
+        $this->estacionamiento =  $args['estacionamiento']  ?? '';
+        $this->creado = date('Y/m/d');
+        $this->vendedorId = $args['vendedorId'] ?? '';
     }
 
-    public static function getErrores(){
-        return static::$errores;
-    }
-
-    public function crear()
+    public static function setDB(\mysqli $db)
     {
-        $query = "INSERT INTO". static::$tabla."(";
-        $query .= implode(",",static::$columnasDB).")";
-        $query .= "VALUES (".implode(",",static::$columnasDB).")";
+        self::$db = $db;
     }
 
-   
+    public  static function getAll()
+    {
+        $query = "SELECT * FROM propiedades";
+        $resultado_consulta = self::$db->query($query);
+        while ($registro = $resultado_consulta->fetch_assoc()) {
+            $arreglo[] = self::crearObjeto($registro);
+        }
+        $resultado_consulta->free();
+        return $arreglo;
+    }
+
+    public static function crearObjeto($registro)
+    {
+        $i = 0;
+        $propiedad = new Propiedad();
+        foreach ($registro as $key => $value) {
+            $propiedad->$key = $value;
+        }
+        return $propiedad;
+    }
+    public function guardar()
+    {
+        $atributos = $this->sanitizarAtributos();
+        $string_columnas = join(',', array_keys($atributos));
+        $string_valores = join("','", array_values($atributos));
+        $query = "INSERT INTO propiedades ( " . $string_columnas . " )";
+        $query .= "VALUES ('" . $string_valores . "' )";
+
+        $resultado = self::$db->query($query);
+        return $resultado;
+    }
+
+    public function Actualizar()
+    {
+        $atributos = $this->sanitizarAtributos();
+        $datos_query = "";
+        $arreglo_temporal = [];
+        foreach ($atributos as $key => $value) {
+            $arreglo_temporal[] =  "$key = '" . $value . "' ";
+        }
+        $datos_query = join(',', $arreglo_temporal);
+        $query = "UPDATE propiedades SET " . $datos_query . "WHERE id ='" . $this->id . "'";
+        $resultado = self::$db->query($query);
+        return $resultado;
+    }
+    public static function Borrar($id)
+    {
+        $query = "DELETE  FROM propiedades WHERE id = ${id}";
+        $resultado = self::$db->query($query);
+        return $resultado;
+    }
+    public function cargarPropiedad($id)
+    {
+        $query = "SELECT * FROM  propiedades WHERE id='$id'";
+        $resultado = self::$db->query($query);
+        foreach ($resultado->fetch_assoc() as $key => $value) {
+            $this->$key = $value;
+        }
+    }
+
+    public function atributos()
+    {
+        $atributos = [];
+        foreach (self::$columnasDB as $columna) {
+            if ($columna === 'id') continue;
+            $atributos[$columna] = $this->$columna;
+        }
+
+        return $atributos;
+    }
+
+    public function setImagen($imagen, $imagen_data = [])
+    {
+        $size = 1000 * 100;
+        if (!empty($imagen_data)) {
+            # code...
+
+            if (!$imagen_data['size'] > $size) {
+                self::$errores[] = "La imagen es muy grande (" . $imagen_data['size'] . ")";
+            }
+            if ($imagen_data['error']) {
+                switch ($imagen_data['error']) {
+                    case UPLOAD_ERR_NO_FILE:
+                        self::$errores[] = "La imagen es obligatoria.";
+                        break;
+                    case UPLOAD_ERR_PARTIAL:
+                        self::$errores[] = "Imagen Subida Parcialmente, Intenta con otra imagen";
+                        break;
+                    case UPLOAD_ERR_INI_SIZE:
+                        self::$errores[] = "Se Excedió el Tamaño Maximo del Archivo. ";
+                        break;
+                }
+            }
+        }
+        if ($imagen) {
+            $this->imagen = $imagen;
+        }
+    }
+    public function sanitizarAtributos()
+    {
+        $atributos =  $this->atributos();
+        $sanitizado = [];
+
+        foreach ($atributos as $key => $value) {
+            $sanitizado[$key] = self::$db->escape_string($value);
+        }
+        return $sanitizado;
+    }
+
+    public static function getErorres()
+    {
+        return self::$errores;
+    }
+
+    public function sincroniza($datos=[])
+    {
+        
+        foreach($datos as $key => $value){
+            if(property_exists($this,$key)){
+                $this->$key = $value;
+            }
+            
+        }
+    }
+
+    public function validar()
+    {
+        if (empty($this->titulo)) {
+            self::$errores[] = "Debes Añadir un Titulo";
+        };
+        if (empty($this->precio)) {
+            self::$errores[] = "Debes Añadir un precio";
+        }
+        if (strlen($this->descripcion) < 50) {
+            self::$errores[] = "La Descripción debe contener más de 50 caracteres";
+        }
+        if ($this->habitaciones < 1) {
+            self::$errores[] = "Debe ser por lo menos una Habitación";
+        }
+
+        if ($this->wc < 1) {
+            self::$errores[] = "Debe ser por lo menos una WC";
+        }
+        if ($this->estacionamiento < 1) {
+            self::$errores[] = "Debe ser por lo menos una Estacionamiento";
+        }
+        
+        if ($this->vendedorId === "") {
+            self::$errores[] = "Debe ser por lo menos una Estacionamiento";
+        }
+        return self::$errores;
+    }
 }
