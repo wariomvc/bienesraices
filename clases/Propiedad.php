@@ -41,6 +41,26 @@ class Propiedad
         self::$db = $db;
     }
 
+    public  static function getAll()
+    {
+        $query = "SELECT * FROM propiedades";
+        $resultado_consulta = self::$db->query($query);
+        while ($registro = $resultado_consulta->fetch_assoc()) {
+            $arreglo[] = self::crearObjeto($registro);
+        }
+        $resultado_consulta->free();
+        return $arreglo;
+    }
+
+    public static function crearObjeto($registro)
+    {
+        $i = 0;
+        $propiedad = new Propiedad();
+        foreach ($registro as $key => $value) {
+            $propiedad->$key = $value;
+        }
+        return $propiedad;
+    }
     public function guardar()
     {
         $atributos = $this->sanitizarAtributos();
@@ -59,10 +79,10 @@ class Propiedad
         $datos_query = "";
         $arreglo_temporal = [];
         foreach ($atributos as $key => $value) {
-            $arreglo_temporal[]=  "$key = '".$value."' ";
+            $arreglo_temporal[] =  "$key = '" . $value . "' ";
         }
-        $datos_query = join(',',$arreglo_temporal);
-        $query = "UPDATE propiedades SET ". $datos_query."WHERE id ='".$this->id."'";
+        $datos_query = join(',', $arreglo_temporal);
+        $query = "UPDATE propiedades SET " . $datos_query . "WHERE id ='" . $this->id . "'";
         $resultado = self::$db->query($query);
         return $resultado;
     }

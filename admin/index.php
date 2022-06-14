@@ -11,6 +11,7 @@ if (!$auth) {
 /* Conectar y Consultar BD */
 
 $db = conectarBD();
+Propiedad::setDB($db);
 
 /* Agregar el Template del Header */
 incluir_template('header');
@@ -26,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $query = "SELECT imagen FROM propiedades WHERE id = ${id}";
         $resultado_imagen = mysqli_query($db, $query);
         $propiedad = new Propiedad();
-        Propiedad::setDB($db);
+        
         $propiedad->cargarPropiedad($id);        
         $resultado = Propiedad::Borrar($id);
 
@@ -40,8 +41,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$query = "SELECT * FROM propiedades";
-$resultado_consulta = mysqli_query($db, $query);
+/* $query = "SELECT * FROM propiedades";
+$resultado_consulta = mysqli_query($db, $query); */
+
+$propiedades = Propiedad::getAll();
 ?>
 <main class="contenedor seccion">
     <h1>Administración</h1>
@@ -66,22 +69,22 @@ $resultado_consulta = mysqli_query($db, $query);
             </tr>
         </thead>
         <tbody>
-            <?php while ($propiedad = mysqli_fetch_assoc($resultado_consulta)) : ?>
+            <?php foreach ($propiedades as $propiedad) : ?>
                 <tr>
-                    <td><?php echo $propiedad['id'] ?></td>
-                    <td><?php echo $propiedad['titulo'] ?></td>
-                    <td><img src="/imagenes/<?php echo $propiedad['imagen'] ?>" alt="" class="imagen-tabla"></td>
-                    <td><?php echo "$" . $propiedad['precio'] ?></td>
+                    <td><?php echo $propiedad->id ?></td>
+                    <td><?php echo $propiedad->titulo ?></td>
+                    <td><img src="/imagenes/<?php echo $propiedad->imagen ?>" alt="" class="imagen-tabla"></td>
+                    <td><?php echo "$" . $propiedad->precio ?></td>
                     <td>
-                        <a href="/admin/propiedades/actualizar.php?id=<?php echo $propiedad['id'] ?>" class="boton-verde-block">Editar</a>
+                        <a href="/admin/propiedades/actualizar.php?id=<?php echo $propiedad->id ?>" class="boton-verde-block">Editar</a>
                         <form method="POST"  class="w-100">
-                            <input type="hidden" name="id" value="<?php echo $propiedad['id'] ?>">
+                            <input type="hidden" name="id" value="<?php echo $propiedad->id ?>">
                             <input type="submit" value="Eliminar" class="boton-rojo-block">
                         </form>
 
                     </td>
                 </tr>
-            <?php endwhile ?>
+            <?php endforeach ?>
         </tbody>
     </table>
 </main>
