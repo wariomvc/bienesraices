@@ -24,7 +24,7 @@ $propiedad->cargarPropiedad($id_propiedad);
 $consulta2 = "SELECT * FROM vendedores";
 $resultado_vendedores = mysqli_query($db, $consulta2);
 
-//$errores = [];
+$errores = [];
 
 
 
@@ -66,7 +66,7 @@ incluir_template('header');
     <h1>Actualizar Propiedad</h1>
     <a href="/admin/index.php" class="boton-verde" id="">Volver</a>
 
-    <?php foreach ($msg_errores as $error) : ?>
+    <?php foreach ($errores as $error) : ?>
         <div class="alerta error">
             <?php echo $error ?>
         </div>

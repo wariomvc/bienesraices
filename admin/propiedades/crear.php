@@ -33,10 +33,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $habitaciones = $_POST['habitaciones'];
     $wc = $_POST['wc'];
     $estacionamiento = $_POST['estacionamiento'];
-    $vendedorId = $_POST['vendedorId'];
+    
     //$imagen_propiedad = $_POST['imagen'];
     $nombre_imagen = md5(uniqid(rand())) . ".jpg";
     $propiedad = new Propiedad($_POST);
+    $propiedad->vendedorId = "1";
     $errores = $propiedad->validar();
     $propiedad->setImagen($nombre_imagen,$_FILES['imagen']);
     

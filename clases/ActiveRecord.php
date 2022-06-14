@@ -2,39 +2,16 @@
 
 namespace App;
 
-class Propiedad
+class ActiveRecord
 {
-    protected static $tabla = 'propiedades';
-    protected static $columnasDB = ['id', 'titulo', 'precio', 'imagen', 'descripcion', 'habitaciones', 'wc', 'estacionamiento', 'creado', 'vendedorId'];
+    protected static $tabla = '';
+    protected static $columnasDB = [];
     protected static $db;
-    public $id;
-    public $titulo;
-    public $precio;
-    public $imagen;
-    public $imagen_dataform;
-    public $descripcion;
-    public $habitaciones;
-    public $wc;
-    public $estacionamiento;
-    public $creado;
-    public $vendedorId;
+    
 
     protected static $errores = [];
 
-    public function __construct($args = [])
-    {
-        $this->id = $args['id'] ?? null;
-        $this->titulo = $args['titulo'] ?? '';
-        $this->precio = $args['precio'] ?? '';
-        $this->descripcion = $args['descripcion'] ?? '';
-        $this->imagen = '';
-
-        $this->habitaciones = $args['habitaciones'] ?? '';
-        $this->wc = $args['wc'] ?? '';
-        $this->estacionamiento =  $args['estacionamiento']  ?? '';
-        $this->creado = date('Y/m/d');
-        $this->vendedorId = $args['vendedorId'] ?? '';
-    }
+    
 
     public static function setDB(\mysqli $db)
     {
@@ -43,7 +20,7 @@ class Propiedad
 
     public  static function getAll()
     {
-        $query = "SELECT * FROM propiedades";
+        $query = "SELECT * FROM " . static::$tabla;
         $resultado_consulta = self::$db->query($query);
         while ($registro = $resultado_consulta->fetch_assoc()) {
             $arreglo[] = self::crearObjeto($registro);
@@ -55,18 +32,18 @@ class Propiedad
     public static function crearObjeto($registro)
     {
         $i = 0;
-        $propiedad = new Propiedad();
+        $objeto = new static;
         foreach ($registro as $key => $value) {
-            $propiedad->$key = $value;
+            $objeto->$key = $value;
         }
-        return $propiedad;
+        return $objeto;
     }
     public function guardar()
     {
         $atributos = $this->sanitizarAtributos();
         $string_columnas = join(',', array_keys($atributos));
         $string_valores = join("','", array_values($atributos));
-        $query = "INSERT INTO propiedades ( " . $string_columnas . " )";
+        $query = "INSERT INTO " . static::$tabla . " ( " . $string_columnas . " )";
         $query .= "VALUES ('" . $string_valores . "' )";
 
         $resultado = self::$db->query($query);
@@ -82,19 +59,19 @@ class Propiedad
             $arreglo_temporal[] =  "$key = '" . $value . "' ";
         }
         $datos_query = join(',', $arreglo_temporal);
-        $query = "UPDATE propiedades SET " . $datos_query . "WHERE id ='" . $this->id . "'";
+        $query = "UPDATE " . static::$tabla . " SET " . $datos_query . "WHERE id ='" . $this->id . "'";
         $resultado = self::$db->query($query);
         return $resultado;
     }
-    public static function Borrar($id)
+    public function Borrar()
     {
-        $query = "DELETE  FROM propiedades WHERE id = ${id}";
+        $query = "DELETE  FROM ". static::$tabla ." WHERE id = '$this->id'";
         $resultado = self::$db->query($query);
         return $resultado;
     }
     public function cargarPropiedad($id)
     {
-        $query = "SELECT * FROM  propiedades WHERE id='$id'";
+        $query = "SELECT * FROM  ". static::$tabla ." WHERE id='$id'";
         $resultado = self::$db->query($query);
         foreach ($resultado->fetch_assoc() as $key => $value) {
             $this->$key = $value;
@@ -104,7 +81,7 @@ class Propiedad
     public function atributos()
     {
         $atributos = [];
-        foreach (self::$columnasDB as $columna) {
+        foreach (static::$columnasDB as $columna) {
             if ($columna === 'id') continue;
             $atributos[$columna] = $this->$columna;
         }
@@ -155,14 +132,13 @@ class Propiedad
         return self::$errores;
     }
 
-    public function sincroniza($datos=[])
+    public function sincroniza($datos = [])
     {
-        
-        foreach($datos as $key => $value){
-            if(property_exists($this,$key)){
+
+        foreach ($datos as $key => $value) {
+            if (property_exists($this, $key)) {
                 $this->$key = $value;
             }
-            
         }
     }
 
@@ -187,9 +163,9 @@ class Propiedad
         if ($this->estacionamiento < 1) {
             self::$errores[] = "Debe ser por lo menos una Estacionamiento";
         }
-        
+
         if ($this->vendedorId === "") {
-            self::$errores[] = "Debe ser por lo menos una Estacionamiento";
+            self::$errores[] = "Elija un Vendedor";
         }
         return self::$errores;
     }

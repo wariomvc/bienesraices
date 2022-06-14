@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $propiedad = new Propiedad();
         
         $propiedad->cargarPropiedad($id);        
-        $resultado = Propiedad::Borrar($id);
+        $resultado = $propiedad->Borrar();
 
         
         if ($resultado_imagen) {
@@ -40,9 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-
-/* $query = "SELECT * FROM propiedades";
-$resultado_consulta = mysqli_query($db, $query); */
 
 $propiedades = Propiedad::getAll();
 ?>
