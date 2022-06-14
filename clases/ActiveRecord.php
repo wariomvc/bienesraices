@@ -21,11 +21,12 @@ class ActiveRecord
     public  static function getAll()
     {
         $query = "SELECT * FROM " . static::$tabla;
-        $resultado_consulta = self::$db->query($query);
+        $resultado_consulta = self::$db->query($query);        
         while ($registro = $resultado_consulta->fetch_assoc()) {
             $arreglo[] = self::crearObjeto($registro);
         }
         $resultado_consulta->free();
+        
         return $arreglo;
     }
 

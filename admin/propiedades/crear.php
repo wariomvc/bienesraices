@@ -2,6 +2,7 @@
 
 require '../../includes/app.php';
 use App\Propiedad;
+use App\Vendedor;
 use Intervention\Image\ImageManagerStatic as Image;
 
 $auth = isAutenticado();
@@ -9,15 +10,12 @@ if (!$auth) {
     header('Location: /');
 }
 
-$db = conectarBD();
+
 $propiedad = new Propiedad();
-$consulta = "SELECT * FROM  vendedores";
-$resultado = mysqli_query($db, $consulta, MYSQLI_STORE_RESULT);
-
-
-
-
+Vendedor::setDB($db);
+$vendedores = Vendedor::getAll();
 $errores = Propiedad::getErorres();
+
 $titulo = '';
 $precio = '';
 $descripcion = '';
@@ -27,14 +25,7 @@ $estacionamiento = '';
 $vendedorId = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $titulo = $_POST['titulo'];
-    $precio = $_POST['precio'];
-    $descripcion = $_POST['descripcion'];
-    $habitaciones = $_POST['habitaciones'];
-    $wc = $_POST['wc'];
-    $estacionamiento = $_POST['estacionamiento'];
     
-    //$imagen_propiedad = $_POST['imagen'];
     $nombre_imagen = md5(uniqid(rand())) . ".jpg";
     $propiedad = new Propiedad($_POST);
     $propiedad->vendedorId = "1";
