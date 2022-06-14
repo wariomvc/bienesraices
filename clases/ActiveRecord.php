@@ -143,31 +143,5 @@ class ActiveRecord
         }
     }
 
-    public function validar()
-    {
-        if (empty($this->titulo)) {
-            self::$errores[] = "Debes Añadir un Titulo";
-        };
-        if (empty($this->precio)) {
-            self::$errores[] = "Debes Añadir un precio";
-        }
-        if (strlen($this->descripcion) < 50) {
-            self::$errores[] = "La Descripción debe contener más de 50 caracteres";
-        }
-        if ($this->habitaciones < 1) {
-            self::$errores[] = "Debe ser por lo menos una Habitación";
-        }
-
-        if ($this->wc < 1) {
-            self::$errores[] = "Debe ser por lo menos una WC";
-        }
-        if ($this->estacionamiento < 1) {
-            self::$errores[] = "Debe ser por lo menos una Estacionamiento";
-        }
-
-        if ($this->vendedorId === "") {
-            self::$errores[] = "Elija un Vendedor";
-        }
-        return self::$errores;
-    }
+    
 }

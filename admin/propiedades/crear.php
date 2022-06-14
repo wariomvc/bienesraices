@@ -28,7 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     $nombre_imagen = md5(uniqid(rand())) . ".jpg";
     $propiedad = new Propiedad($_POST);
-    $propiedad->vendedorId = "1";
     $errores = $propiedad->validar();
     $propiedad->setImagen($nombre_imagen,$_FILES['imagen']);
     
