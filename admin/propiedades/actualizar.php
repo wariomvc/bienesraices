@@ -33,7 +33,6 @@ $errores = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $propiedad->sincroniza($_POST);
     
-    $propiedad->vendedorId = "1";
     $errores = $propiedad->validar();
 
     $nombre_imagen = md5(uniqid(rand())) . ".jpg";
