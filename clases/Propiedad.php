@@ -155,6 +155,17 @@ class Propiedad
         return self::$errores;
     }
 
+    public function sincroniza($datos=[])
+    {
+        
+        foreach($datos as $key => $value){
+            if(property_exists($this,$key)){
+                $this->$key = $value;
+            }
+            
+        }
+    }
+
     public function validar()
     {
         if (empty($this->titulo)) {
@@ -176,7 +187,7 @@ class Propiedad
         if ($this->estacionamiento < 1) {
             self::$errores[] = "Debe ser por lo menos una Estacionamiento";
         }
-        /**/
+        
         if ($this->vendedorId === "") {
             self::$errores[] = "Debe ser por lo menos una Estacionamiento";
         }
