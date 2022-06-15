@@ -35,4 +35,5 @@
         <?php endforeach ?>
     </select>
 </fieldset>
+<input type="hidden" name="tipo" value="propiedad">
 <input type="submit" value="Enviar" class="boton boton-verde-block">

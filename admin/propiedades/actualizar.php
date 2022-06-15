@@ -21,7 +21,7 @@ $vendedores = Vendedor::getAll();
 
 $id_propiedad = $_GET['id'];
 $id_propiedad = filter_var($id_propiedad, FILTER_VALIDATE_INT);
-$propiedad->cargarPropiedad($id_propiedad);
+$propiedad->getById($id_propiedad);
 
 $consulta2 = "SELECT * FROM vendedores";
 $resultado_vendedores = mysqli_query($db, $consulta2);

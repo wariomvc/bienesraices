@@ -70,7 +70,7 @@ class ActiveRecord
         $resultado = self::$db->query($query);
         return $resultado;
     }
-    public function cargarPropiedad($id)
+    public function getById($id)
     {
         $query = "SELECT * FROM  ". static::$tabla ." WHERE id='$id'";
         $resultado = self::$db->query($query);

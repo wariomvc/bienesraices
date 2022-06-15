@@ -1,5 +1,6 @@
 <?php
 require '../includes/app.php';
+
 use App\Propiedad;
 use App\Vendedor;
 
@@ -23,18 +24,20 @@ incluir_template('header');
 $mensaje = "La Propiedad se ha Regisrado Exitosamente";
 $respuesta = $_GET['res'] ?? null;
 
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
     $id = $_POST['id'];
     $id = filter_var($id, FILTER_VALIDATE_INT);
     if ($id) {
         $query = "SELECT imagen FROM propiedades WHERE id = ${id}";
         $resultado_imagen = mysqli_query($db, $query);
         $propiedad = new Propiedad();
-        
-        $propiedad->cargarPropiedad($id);        
+
+        $propiedad->getById($id);
         $resultado = $propiedad->Borrar();
 
-        
+
         if ($resultado_imagen) {
             unlink("../imagenes/" . $propiedad->imagen);
         }
@@ -48,15 +51,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <main class="contenedor seccion">
     <h1>Administración</h1>
-    <?php if (intval($respuesta) === 1) : ?>
-        <p class="alerta exito">La Propiedad se ha Regisrado Exitosamente</p>
-    <?php endif; ?>
-    <?php if (intval($respuesta) === 2) : ?>
-        <p class="alerta exito">La Propiedad se Actualizó Correctamente</p>
-    <?php endif; ?>
-    <?php if (intval($respuesta) === 3) : ?>
-        <p class="alerta exito">Propiedad Eliminada Correctamente</p>
-    <?php endif; ?>
+    
+        <?php if (intval($respuesta) === 1) : ?>
+            <p class="alerta exito">Se Agregó Correctamente</p>
+        <?php endif; ?>
+        <?php if (intval($respuesta) === 2) : ?>
+            <p class="alerta exito">Actualización Exitosa</p>
+        <?php endif; ?>
+        <?php if (intval($respuesta) === 3) : ?>
+            <p class="alerta exito">Se Eliminó Correctamente</p>
+        <?php endif; ?>
+    
+  
     <a href="/admin/propiedades/crear.php" class="boton-verde" id="">Nueva Propiedad</a>
     <table class="propiedades">
         <thead>
@@ -77,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <td><?php echo "$" . $propiedad->precio ?></td>
                     <td>
                         <a href="/admin/propiedades/actualizar.php?id=<?php echo $propiedad->id ?>" class="boton-verde-block">Editar</a>
-                        <form method="POST"  class="w-100">
+                        <form method="POST" class="w-100">
                             <input type="hidden" name="id" value="<?php echo $propiedad->id ?>">
                             <input type="submit" value="Eliminar" class="boton-rojo-block">
                         </form>
@@ -110,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <td><?php echo $vendedor->telefono ?></td>
                     <td>
                         <a href="/admin/vendedores/actualizar.php?id=<?php echo $vendedor->id ?>" class="boton-verde-block">Editar</a>
-                        <form method="POST"  class="w-100">
+                        <form method="POST" class="w-100">
                             <input type="hidden" name="id" value="<?php echo $vendedor->id ?>">
                             <input type="submit" value="Eliminar" class="boton-rojo-block">
                         </form>
