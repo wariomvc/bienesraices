@@ -5,7 +5,7 @@ namespace Controller;
 use Model\Propiedad;
 use Model\Vendedor;
 use MVC\Router;
-
+use Intervention\Image\ImageManagerStatic as Image;
 
 class PropiedadController
 {
@@ -88,11 +88,61 @@ class PropiedadController
             'propiedades' => $propiedades,
             'vendedores' => $vendedores,
             'mensaje' => "La Propiedad se ha Regisrado Exitosamente",
-        'respuesta' => $_GET['res'] ?? null,
+            'respuesta' => $_GET['res'] ?? null,
         ]);
     }
 
-    public static function crear(Router $router){
-        
+    public static function crear(Router $router)
+    {
+        $db = conectarBD();
+        $auth = isAutenticado();
+        if (!$auth) {
+            header('Location: /');
+        }
+
+
+        $propiedad = new Propiedad();
+        Vendedor::setDB($db);
+        $vendedores = Vendedor::getAll();
+        $errores = Propiedad::getErorres();
+
+        $titulo = '';
+        $precio = '';
+        $descripcion = '';
+        $habitaciones = '';
+        $wc = '';
+        $estacionamiento = '';
+        $vendedorId = '';
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $nombre_imagen = md5(uniqid(rand())) . ".jpg";
+            $propiedad = new Propiedad($_POST);
+            $errores = $propiedad->validar();
+            $propiedad->setImagen($nombre_imagen, $_FILES['imagen']);
+
+            $carpeta_imagenes = 'imagenes/';
+            if (!is_dir($carpeta_imagenes)) {
+            }
+
+            $errores = $propiedad->getErorres();
+            if (empty($errores)) {
+                $propiedad::setDB($db);
+                $r = $propiedad->guardar();
+                $image = Image::make($_FILES['imagen']['tmp_name'])->fit(800, 600);
+                
+                $image->save($carpeta_imagenes . $nombre_imagen);
+                
+
+                //echo $query;      
+                if ($r) {
+                    header('Location: /admin?res=1');
+                }
+            }
+        }
+        $router->render('admin/crear',[
+            "errores"=>$errores,
+            "propiedad"=>$propiedad,
+            "vendedores"=>$vendedores
+        ]);
     }
 }

@@ -12,4 +12,5 @@ $router->get("/nosotros",[PropiedadController::class,"nosotros"]);
 $router->get("/anuncios",[PropiedadController::class,"anuncios"]);
 $router->get("/admin",[PropiedadController::class,"admin"]);
 $router->get("/admin/propiedades/crear",[PropiedadController::class,"crear"]);
+$router->post("/admin/propiedades/crear",[PropiedadController::class,"crear"]);
 $router->enlazarRutas();
