@@ -25,4 +25,6 @@ $router->post('/admin/vendedores/crear',[VendedoresController::class,'crear']);
 $router->get('/admin/vendedores/actualizar',[VendedoresController::class,'actualizar']);
 $router->post('/admin/vendedores/actualizar',[VendedoresController::class,'actualizar']);
 
+$router->post("/admin/vendedores/borrar",[VendedoresController::class,"borrar"]);
+
 $router->enlazarRutas();

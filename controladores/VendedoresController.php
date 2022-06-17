@@ -90,4 +90,25 @@ class VendedoresController
             "errores" => $errores,
         ]);
     }
+     public static function borrar(Router $router)
+    {
+        
+        $db = conectarBD();
+        Vendedor::setDB($db);
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            $id = $_POST['id'];
+            $id = filter_var($id, FILTER_VALIDATE_INT);
+            if ($id) {
+
+                $vendedor = new Vendedor();
+
+                $vendedor->getById($id);
+                $resultado = $vendedor->Borrar();
+                if ($resultado) {
+                    header("location: /admin?res=3");
+                }
+            }
+        }
+    }
 }
