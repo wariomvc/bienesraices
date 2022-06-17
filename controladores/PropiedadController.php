@@ -6,6 +6,7 @@ use Model\Propiedad;
 use Model\Vendedor;
 use MVC\Router;
 use Intervention\Image\ImageManagerStatic as Image;
+use Model\ActiveRecord;
 
 class PropiedadController
 {
@@ -144,5 +145,35 @@ class PropiedadController
             "propiedad"=>$propiedad,
             "vendedores"=>$vendedores
         ]);
+    }
+
+    public static function borrar(Router $router)
+    {
+        $db = conectarBD();
+        Propiedad::setDB($db);
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            $id = $_POST['id'];
+            $id = filter_var($id, FILTER_VALIDATE_INT);
+            if ($id) {
+                
+                $propiedad = new Propiedad();
+        
+                $propiedad->getById($id);
+                $resultado = $propiedad->Borrar();
+                if ($propiedad->imagen) {
+                    unlink("imagenes/" . $propiedad->imagen);
+                }
+                if ($resultado) {
+                    header("location: /admin?res=3");
+                }
+            }
+        }
+    }
+
+    public static function actualizar(Router $router)
+    {
+        
+        # code...
     }
 }

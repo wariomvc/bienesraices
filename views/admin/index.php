@@ -38,7 +38,7 @@
                     <td><?php echo "$" . $propiedad->precio ?></td>
                     <td>
                         <a href="/admin/propiedades/actualizar.php?id=<?php echo $propiedad->id ?>" class="boton-verde-block">Editar</a>
-                        <form method="POST" class="w-100">
+                        <form action="admin/propiedades/borrar" method="POST" class="w-100">
                             <input type="hidden" name="id" value="<?php echo $propiedad->id ?>">
                             <input type="submit" value="Eliminar" class="boton-rojo-block">
                         </form>

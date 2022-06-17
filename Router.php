@@ -20,6 +20,7 @@ class Router
 
     public  function enlazarRutas()
     {
+        
         $url = $_SERVER['PATH_INFO'] ?? '/';
         if ($_SERVER["REQUEST_METHOD"] === 'GET') {
             $function = $this->routesGet[$url] ?? null;
@@ -27,11 +28,12 @@ class Router
             $function = $this->routesPost[$url] ?? null;
         }
         if ($function) {
-
+            
             call_user_func($function, $this);
         } else {
             return  "Pagina no encontrada";
         }
+        
     }
 
     public function render($vista, $parametros = [])
