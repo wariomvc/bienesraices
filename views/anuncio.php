@@ -1,21 +1,9 @@
-<?php 
-/* Iimportamos la conexion */
-
-use App\Propiedad;
-
-$db = conectarBD();
-
-/* Consultar Propiedades */
-Propiedad::setDB($db);
-$propiedades = Propiedad::getAll();
-
-
-?>
+<?php debuguear($propiedades); ?>
 <?php foreach($propiedades as $propiedad): ?>
 <div class="anuncio">
     <picture>
         
-        <img src="/imagenes/<?php echo $propiedad->imagen ?>" alt="">
+       <!--  <img src="/imagenes/<?php //echo $propiedad->imagen ?>" alt=""> -->
     </picture>
     <div class="anuncio-contenido">
         <h3>Casa de Lujo</h3>

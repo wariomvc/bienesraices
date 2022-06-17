@@ -10,4 +10,6 @@ $router->get("/contacto",[PropiedadController::class,"contacto"]);
 $router->get("/blog",[PropiedadController::class,"blog"]);
 $router->get("/nosotros",[PropiedadController::class,"nosotros"]);
 $router->get("/anuncios",[PropiedadController::class,"anuncios"]);
+$router->get("/admin",[PropiedadController::class,"admin"]);
+$router->get("/admin/propiedades/crear",[PropiedadController::class,"crear"]);
 $router->enlazarRutas();
