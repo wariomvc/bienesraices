@@ -6,7 +6,7 @@ use Model\Propiedad;
 use Model\Vendedor;
 use MVC\Router;
 use Intervention\Image\ImageManagerStatic as Image;
-use Model\ActiveRecord;
+
 
 class PropiedadController
 {
@@ -130,9 +130,9 @@ class PropiedadController
                 $propiedad::setDB($db);
                 $r = $propiedad->guardar();
                 $image = Image::make($_FILES['imagen']['tmp_name'])->fit(800, 600);
-                
+
                 $image->save($carpeta_imagenes . $nombre_imagen);
-                
+
 
                 //echo $query;      
                 if ($r) {
@@ -140,10 +140,10 @@ class PropiedadController
                 }
             }
         }
-        $router->render('admin/crear',[
-            "errores"=>$errores,
-            "propiedad"=>$propiedad,
-            "vendedores"=>$vendedores
+        $router->render('admin/crear', [
+            "errores" => $errores,
+            "propiedad" => $propiedad,
+            "vendedores" => $vendedores
         ]);
     }
 
@@ -156,9 +156,9 @@ class PropiedadController
             $id = $_POST['id'];
             $id = filter_var($id, FILTER_VALIDATE_INT);
             if ($id) {
-                
+
                 $propiedad = new Propiedad();
-        
+
                 $propiedad->getById($id);
                 $resultado = $propiedad->Borrar();
                 if ($propiedad->imagen) {
@@ -174,6 +174,67 @@ class PropiedadController
     public static function actualizar(Router $router)
     {
         
-        # code...
+        $auth = isAutenticado();
+
+        if (!$auth) {
+            header('Location: /');
+        }
+
+        $db = conectarBD();
+        $propiedad = new Propiedad();
+        Propiedad::setDB($db);
+        $vendedores = Vendedor::getAll();
+
+
+        $id_propiedad = $_GET['id'];
+        $id_propiedad = filter_var($id_propiedad, FILTER_VALIDATE_INT);
+        $propiedad->getById($id_propiedad);
+
+        $consulta2 = "SELECT * FROM vendedores";
+        $resultado_vendedores = mysqli_query($db, $consulta2);
+
+        $errores = [];
+
+
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            
+            $propiedad->sincroniza($_POST);
+
+            $errores = $propiedad->validar();
+
+            $nombre_imagen = md5(uniqid(rand())) . ".jpg";
+
+
+            $carpeta_imagenes = 'imagenes/';
+            if (!is_dir($carpeta_imagenes)) {
+                mkdir($carpeta_imagenes);
+            }
+
+            if (!$_FILES['imagen']['error']) {
+                $propiedad->setImagen($nombre_imagen, $_FILES['imagen']);
+                $image = Image::make($_FILES['imagen']['tmp_name'])->fit(800, 600);
+                $image->save($carpeta_imagenes . $nombre_imagen);
+                if ($propiedad->imagen) {
+                    unlink("imagenes/" . $propiedad->imagen);
+                }
+            } else {
+                $propiedad->setImagen($propiedad->imagen);
+            }
+
+
+            if (empty($errores)) {
+                $r = $propiedad->Actualizar();
+                if ($r) {
+                    header('Location: /admin?res=2');
+                }
+            }
+            # code...
+        }
+        $router->render('admin/actualizar',[
+            'propiedad'=>$propiedad,
+            'errores'=> $errores,
+            'vendedores'=>$vendedores
+        ]);
     }
 }
