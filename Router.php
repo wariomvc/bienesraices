@@ -23,6 +23,8 @@ class Router
         
         $url = $_SERVER['PATH_INFO'] ?? '/';
         if ($_SERVER["REQUEST_METHOD"] === 'GET') {
+            
+            
             $function = $this->routesGet[$url] ?? null;
         } else {
             $function = $this->routesPost[$url] ?? null;
@@ -31,7 +33,9 @@ class Router
             
             call_user_func($function, $this);
         } else {
+            
             return  "Pagina no encontrada";
+            
         }
         
     }

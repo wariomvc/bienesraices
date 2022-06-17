@@ -51,7 +51,7 @@
 </main>
 <section class="contenedor seccion">
     <h2>Vendedores</h2>
-    <a href="/admin/vendedores/crear.php" class="boton-verde" id="">Nuevo Vendedor</a>
+    <a href="/admin/vendedores/crear" class="boton-verde" id="">Nuevo Vendedor</a>
     <table class="propiedades">
         <thead>
             <tr>
