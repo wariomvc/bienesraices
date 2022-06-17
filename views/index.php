@@ -1,8 +1,9 @@
 <?php 
-require 'includes/app.php';
+/* require 'includes/app.php';
 $inicio = true;
 
-incluir_template('header', true)
+incluir_template('header', true) */
+$inicio='inicio';
  ?>
     <main class="contenedor seccion">
         <h1>Más Sobre Nosotros</h1>
@@ -31,7 +32,7 @@ incluir_template('header', true)
     <section class="contenedor seccion">
         <h2>Casas en Venta</h2>
         <div class="contenedor-anuncios">
-            <?php incluir_template("anuncio")?>
+            <?php // incluir_template("anuncio")?>
         </div> <!-- Contenedor de Anuncios -->
         <div class="ver-todos alinear-derecha">
             <a href="" class="boton-verde">Ver Todos</a>
@@ -100,7 +101,6 @@ incluir_template('header', true)
             </div>
         </section>
     </div>
-    <?php incluir_template('footer')?>
     <script src="build/js/bundle.min.js"></script>
 </body>
 
