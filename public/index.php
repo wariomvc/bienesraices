@@ -21,4 +21,8 @@ $router->post("/admin/propiedades/actualizar",[PropiedadController::class,"actua
 
 $router->get('/admin/vendedores/crear',[VendedoresController::class,'crear']);
 $router->post('/admin/vendedores/crear',[VendedoresController::class,'crear']);
+
+$router->get('/admin/vendedores/actualizar',[VendedoresController::class,'actualizar']);
+$router->post('/admin/vendedores/actualizar',[VendedoresController::class,'actualizar']);
+
 $router->enlazarRutas();

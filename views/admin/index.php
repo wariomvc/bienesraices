@@ -70,7 +70,7 @@
                     <td><?php echo $vendedor->apellido ?></td>
                     <td><?php echo $vendedor->telefono ?></td>
                     <td>
-                        <a href="/admin/vendedores/actualizar.php?id=<?php echo $vendedor->id ?>" class="boton-verde-block">Editar</a>
+                        <a href="/admin/vendedores/actualizar?id=<?php echo $vendedor->id ?>" class="boton-verde-block">Editar</a>
                         <form method="POST" class="w-100">
                             <input type="hidden" name="id" value="<?php echo $vendedor->id ?>">
                             <input type="submit" value="Eliminar" class="boton-rojo-block">

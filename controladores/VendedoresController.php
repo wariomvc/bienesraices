@@ -1,6 +1,7 @@
 <?php
 
 namespace Controller;
+
 use Model\Vendedor;
 use MVC\Router;
 
@@ -9,7 +10,7 @@ class VendedoresController
 {
     public static function crear(Router $router)
     {
-        
+
         $db = conectarBD();
 
         $auth = isAutenticado();
@@ -41,10 +42,52 @@ class VendedoresController
                 }
             }
         }
-        $router->render("vendedores/crear",[
-            "errores"=>$errores,
-            "vendedor"=>$vendedor,
+        $router->render("vendedores/crear", [
+            "errores" => $errores,
+            "vendedor" => $vendedor,
         ]);
+    }
+    public static function actualizar(Router $router)
+    {
         
+        $db = conectarBD();
+        $auth = isAutenticado();
+
+        if (!$auth) {
+            header('Location: /');
+        }
+
+        $db = conectarBD();
+        $vendedor = new Vendedor();
+        Vendedor::setDB($db);
+
+
+        $id_vendedor = $_GET['id'];
+        $id_vendedor = filter_var($id_vendedor, FILTER_VALIDATE_INT);
+        $vendedor->getById($id_vendedor);
+
+
+        $errores = [];
+
+
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $vendedor->sincroniza($_POST);
+
+            $errores = $vendedor->validar();
+
+
+
+            if (empty($errores)) {
+                $r = $vendedor->Actualizar();
+                if ($r) {
+                    header('Location: /admin?res=2');
+                }
+            }
+        }
+        $router->render('vendedores/actualizar',[
+            "vendedor"=> $vendedor,
+            "errores" => $errores,
+        ]);
     }
 }
